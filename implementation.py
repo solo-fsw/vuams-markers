@@ -41,7 +41,7 @@ marker_string = hex_string()
 
 packet = bytearray([*HEADER, *marker_beep, *marker_id, *marker_string])
 
-def add_checksum(packet):
+def calc_checksum(packet):
     hex_data = [hex(x) for x in packet]
     for i, x in enumerate(hex_data):
         if len(x) <= 3:
@@ -54,11 +54,13 @@ def add_checksum(packet):
 
     reversed_checksum = list(bytearray.fromhex(calc_checksum))[::-1]
     checksum = [hex(x)[2:] for x in reversed_checksum]
+    
+    return [int(x, 16) for x in checksum]
 
-    return bytearray([*HEADER, *marker_beep, *marker_id, *marker_string, *[int(x, 16) for x in checksum]])
-        
-#%% Packet
-packet = add_checksum(packet)
+checksum = calc_checksum(packet)
+
+# %% Create packet
+packet = bytearray([*HEADER, *marker_beep, *marker_id, *marker_string, *checksum])
 
 #%%
 ser.write(packet)
