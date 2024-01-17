@@ -14,33 +14,22 @@ for port, desc, hwid in comports():
 HEADER = [0x38, 0x00, 0x0E, 0x00, 0x03, 0x00, 0x30, 0x00, 0xFF, 0xFF, 0xFF, 0xFF]
 
 #%% Beeping
-
 def beeping(beep = True):
     if beep:
         return [0x01, 0x00, 0x00, 0x00]
     elif not beep:
         return [0x00, 0x00, 0x00, 0x00]
 
-marker_beep = beeping()
-
 #%% ID
-
 def hex_id(id=4):
     return [0x04, 0x00, 0x00, 0x00]
 
-marker_id = hex_id()
-
 #%% String
-
 def hex_string(message="4"):
     return [0x44, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]
 
-marker_string = hex_string()
 
 #%% Checksum
-
-packet = bytearray([*HEADER, *marker_beep, *marker_id, *marker_string])
-
 def calc_checksum(packet):
     hex_data = [hex(x) for x in packet]
     for i, x in enumerate(hex_data):
@@ -57,10 +46,16 @@ def calc_checksum(packet):
     
     return [int(x, 16) for x in checksum]
 
-checksum = calc_checksum(packet)
 
 # %% Create packet
-packet = bytearray([*HEADER, *marker_beep, *marker_id, *marker_string, *checksum])
+def compile_packet(beep=True, id=4, message=4):
+    marker_beep = beeping(beep)
+    marker_id = hex_id(id)
+    marker_string = hex_string(message)
+    checksum = calc_checksum(bytearray([*HEADER, *marker_beep, *marker_id, *marker_string]))
+    return bytearray([*HEADER, *marker_beep, *marker_id, *marker_string, *checksum])
+
+packet = compile_packet()
 
 #%%
 ser.write(packet)
