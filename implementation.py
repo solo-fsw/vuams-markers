@@ -22,7 +22,10 @@ def beeping(beep = True):
 
 #%% ID
 def hex_id(id=4):
-    return [0x04, 0x00, 0x00, 0x00]
+    if id > 2**32 - 1:
+        raise ValueError("ID too large for an unsigned int32")
+    byte_id = bytearray(id.to_bytes(4, "little", signed=False))
+    return list(byte_id)
 
 #%% String
 def hex_string(message="4"):
