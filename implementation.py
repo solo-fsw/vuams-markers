@@ -48,7 +48,10 @@ def calc_checksum(packet):
     b = b''.join((binascii.unhexlify(i) for i in hex_data))
     calc_checksum = hex(binascii.crc32(b))[2:]
 
-    reversed_checksum = list(bytearray.fromhex(calc_checksum))[::-1]
+    if len(calc_checksum) % 2 == 0:
+        reversed_checksum = list(bytearray.fromhex(calc_checksum))[::-1]
+    else:
+        reversed_checksum = list(bytearray.fromhex("0" + calc_checksum))[::-1]
     checksum = [hex(x)[2:] for x in reversed_checksum]
     
     return [int(x, 16) for x in checksum]
@@ -62,7 +65,6 @@ def compile_packet(beep=False, id=1, message="SOLO FSW"):
     checksum = calc_checksum(bytearray([*HEADER, *marker_beep, *marker_id, *marker_string]))
     return bytearray([*HEADER, *marker_beep, *marker_id, *marker_string, *checksum])
 
-packet = compile_packet()
-
 #%%
+packet = compile_packet()
 ser.write(packet)
