@@ -6,7 +6,7 @@ import re
 import binascii
 
 for port, desc, hwid in comports():
-    if re.match("USB VID:PID=0403:6001", hwid):  # TODO: Change to vendor id?
+    if re.match("USB VID:PID=0403:6001", hwid):  # TODO: Change to vendor id only?
         ser = serial.Serial(port, 38400, serial.EIGHTBITS, serial.PARITY_NONE, serial.STOPBITS_ONE)
         
 #%% Header
@@ -21,16 +21,20 @@ def beeping(beep = True):
         return [0x00, 0x00, 0x00, 0x00]
 
 #%% ID
-def hex_id(id=4):
+def hex_id(id):
     if id > 2**32 - 1:
         raise ValueError("ID too large for an unsigned int32")
     byte_id = bytearray(id.to_bytes(4, "little", signed=False))
     return list(byte_id)
 
 #%% String
-def hex_string(message="4"):
-    return [0x44, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]
-
+def hex_string(message):
+    if len(message) > 32:
+        raise ValueError("Message too large. Maximum is 32 characters.")
+    msg = [ord(c) for c in message]
+    while len(msg) != 32:
+         msg.append(0)
+    return (msg)
 
 #%% Checksum
 def calc_checksum(packet):
@@ -51,7 +55,7 @@ def calc_checksum(packet):
 
 
 # %% Create packet
-def compile_packet(beep=True, id=4, message=4):
+def compile_packet(beep=False, id=1, message="SOLO FSW"):
     marker_beep = beeping(beep)
     marker_id = hex_id(id)
     marker_string = hex_string(message)
