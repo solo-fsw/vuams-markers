@@ -5,9 +5,14 @@ from serial.tools.list_ports import comports
 import re
 import binascii
 
-for port, desc, hwid in comports():
-    if re.match("USB VID:PID=0403:6001", hwid):  # TODO: Change to vendor id only?
-        ser = serial.Serial(port, 38400, serial.EIGHTBITS, serial.PARITY_NONE, serial.STOPBITS_ONE)
+VID = "0403"
+PID = "6001"
+
+def connect(VID="0403", PID="6001"):
+    for port, desc, hwid in comports():
+        if re.match(f"USB VID:PID={VID}:{PID}", hwid):  # TODO: Change to vendor id only?
+            ser = serial.Serial(port, 38400, serial.EIGHTBITS, serial.PARITY_NONE, serial.STOPBITS_ONE)
+    return ser
         
 #%% Header
 
@@ -66,5 +71,8 @@ def compile_packet(beep=False, id=1, message="SOLO FSW"):
     return bytearray([*HEADER, *marker_beep, *marker_id, *marker_string, *checksum])
 
 #%%
-packet = compile_packet()
-ser.write(packet)
+
+if __name__ == "__main__":
+    ser = connect()
+    packet = compile_packet(True)
+    ser.write(packet)
