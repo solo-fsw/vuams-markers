@@ -4,6 +4,7 @@ import serial
 from serial.tools.list_ports import comports
 import re
 import binascii
+from time import sleep
 
 VID = "0403"
 PID = "6001"
@@ -13,6 +14,14 @@ def connect(VID="0403", PID="6001"):
         if re.match(f"USB VID:PID={VID}:{PID}", hwid):  # TODO: Change to vendor id only?
             ser = serial.Serial(port, 38400, serial.EIGHTBITS, serial.PARITY_NONE, serial.STOPBITS_ONE)
     return ser
+
+def start_recording(vuams_serial):
+    START = [0x08, 0x00, 0x0B, 0x05, 0xB7, 0xDA, 0x6E, 0x77]
+    vuams_serial.write(START)
+
+def stop_recording(vuams_serial):
+    STOP = [0x08, 0x00, 0x0B, 0x06, 0x0D, 0x8B, 0x67, 0xEE]
+    vuams_serial.write(STOP)
         
 #%% Header
 
@@ -75,4 +84,9 @@ def compile_packet(beep=False, id=1, message="SOLO FSW"):
 if __name__ == "__main__":
     ser = connect()
     packet = compile_packet(True)
+    start_recording(ser)
     ser.write(packet)
+    sleep(10)
+    ser.write(packet)
+    sleep(1)
+    stop_recording(ser)
