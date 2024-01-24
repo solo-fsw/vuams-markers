@@ -1,6 +1,6 @@
 #%% Imports and serial connection
 
-import serial
+import serial # Note this is the pyserial toolbox
 from serial.tools.list_ports import comports
 import binascii
 from time import sleep
@@ -34,6 +34,7 @@ def connect(VID="0403", PID="6001", SERIAL_NUMBER="12345678A"):
 def start_recording(vuams_serial):
     START = [0x08, 0x00, 0x0B, 0x05, 0xB7, 0xDA, 0x6E, 0x77]
     vuams_serial.write(START)
+    sleep(3) # force a sleep to allow device to start
 
 def stop_recording(vuams_serial):
     STOP = [0x08, 0x00, 0x0B, 0x06, 0x0D, 0x8B, 0x67, 0xEE]
@@ -107,3 +108,5 @@ if __name__ == "__main__":
     ser.write(packet)
     sleep(1)
     stop_recording(ser)
+
+# %%
