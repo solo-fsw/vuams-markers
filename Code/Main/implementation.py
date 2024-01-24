@@ -2,17 +2,33 @@
 
 import serial
 from serial.tools.list_ports import comports
-import re
 import binascii
 from time import sleep
 
 VID = "0403"
 PID = "6001"
+SERIAL_NUMBER = "12345678"
 
-def connect(VID="0403", PID="6001"):
+def connect(VID="0403", PID="6001", SERIAL_NUMBER="12345678A"):
+    matching = list()
     for port, desc, hwid in comports():
-        if re.match(f"USB VID:PID={VID}:{PID}", hwid):  # TODO: Change to vendor id only?
-            ser = serial.Serial(port, 38400, serial.EIGHTBITS, serial.PARITY_NONE, serial.STOPBITS_ONE)
+        if f"USB VID:PID={VID}:{PID}" in hwid and f"SER={SERIAL_NUMBER}" in hwid:
+            matching.append(port)
+    
+    if len(matching) == 0:
+        raise ConnectionError("No VU-AMS devices found.")
+    elif len(matching) > 1:
+        for port, desc, hwid in comports():
+            if port in matching:
+                print(port, desc, hwid)
+        choice = input("Please enter the COM port you want to connect with.")
+        try:
+            ser = serial.Serial(choice, 38400, serial.EIGHTBITS, serial.PARITY_NONE, serial.STOPBITS_ONE)
+        except:
+            print(f"{choice} was not a valid choice. Aborting.")
+            raise ConnectionError("Something went wrong while connecting to the VU-AMS.")
+    else:
+        ser = serial.Serial(matching[0], 38400, serial.EIGHTBITS, serial.PARITY_NONE, serial.STOPBITS_ONE)
     return ser
 
 def start_recording(vuams_serial):
@@ -83,8 +99,9 @@ def compile_packet(beep=False, id=1, message="SOLO FSW"):
 
 if __name__ == "__main__":
     ser = connect()
-    packet = compile_packet(True)
+    packet = compile_packet(True, id=4, message="SOLO FSW")
     start_recording(ser)
+    sleep(1)
     ser.write(packet)
     sleep(10)
     ser.write(packet)
