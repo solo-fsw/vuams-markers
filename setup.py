@@ -6,7 +6,7 @@ setup(
     url='https://github.com/solo-fsw/vuams-markers',
     author='Evert Dekker, Kerwin Olfers, Jens van Bijsterveld',
     author_email='labsupport@FSW.leidenuniv.nl',
-    packages=['vuams-markers'],
+    packages=['vuams_markers'],
     install_requires=['pyserial'],
     version='0.1',
     license='GPLv3',
