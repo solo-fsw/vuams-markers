@@ -108,5 +108,3 @@ if __name__ == "__main__":
     ser.write(packet)
     sleep(1)
     stop_recording(ser)
-
-# %%
