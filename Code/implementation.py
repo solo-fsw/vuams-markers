@@ -7,7 +7,7 @@ from time import sleep
 
 VID = "0403"
 PID = "6001"
-SERIAL_NUMBER = "12345678"
+SERIAL_NUMBER = "12345678A"
 
 def connect(VID="0403", PID="6001", SERIAL_NUMBER="12345678A"):
     matching = list()
@@ -108,3 +108,4 @@ if __name__ == "__main__":
     ser.write(packet)
     sleep(1)
     stop_recording(ser)
+    ser.close()

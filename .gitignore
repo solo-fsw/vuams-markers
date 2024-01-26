@@ -1,4 +1,5 @@
 *.zip
 *.docx
 *.exe
+*.csv
 __pycache__/

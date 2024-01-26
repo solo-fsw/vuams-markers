@@ -55,3 +55,9 @@ sleep(1)  # Final action
 # Stop the vuams recording
 stop_recording(ser)
 ```
+
+## OpenSesame
+
+This implementation is compatible with OpenSesame 3.3.14 and above.
+
+An example of an OpenSesame task sending vuams markers can be found in the repository (`Code\Example\Example_vuams.osexp`).
