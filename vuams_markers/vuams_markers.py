@@ -9,7 +9,7 @@ VID = "0403"
 PID = "6001"
 SERIAL_NUMBER = "12345678"
 
-def connect(VID="0403", PID="6001", SERIAL_NUMBER="12345678A"):
+def connect(VID="0403", PID="6001", SERIAL_NUMBER="12345678"):
     matching = list()
     for port, desc, hwid in comports():
         if f"USB VID:PID={VID}:{PID}" in hwid and f"SER={SERIAL_NUMBER}" in hwid:
